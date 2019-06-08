@@ -50,7 +50,7 @@ const medicationIDs = [1946955]
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/data', router)
+app.use('/data', router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

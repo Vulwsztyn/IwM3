@@ -1,0 +1,35 @@
+extends layout
+
+block content
+  div.grid-container#header
+      div
+        button &#8592; Go Back
+      div
+        p #{data.id}
+      div
+        p #{data.name[0].text} #{data.name[0].family}
+      div
+        p #{data.birthDate}
+      div
+        p #{data.gender}
+
+  div.body
+
+    div.grid-container#buttons
+      div
+        input(type='date' name='dateFrom').date
+      div
+        input(type='date' name='dateTo').date
+
+
+    div.grid-container.observations
+      each observation in data.Observations
+        div
+          p= observation.effectiveDateTime
+        div
+          p= observation.code.text
+
+    //div.grid-container.observations
+    //  each medication in data.MedicationStatements.medicationCodeableConcept.coding[0].display
+    //    div
+    //      p= medication.medicationCodeableConcept.coding
