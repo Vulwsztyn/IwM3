@@ -18,8 +18,10 @@ const defVals = {
   MedicationStatement: '1952915',
 }
 const R = require('ramda')
-function patientFromRespone(r, klasa) {
-  return R.pick(Object.keys(new klasy[klasa]()), r)
+function patientFromRespone(r, ms,obs) {
+  let wynik = R.pick(Object.keys(new Patient()), r)
+  wynik= {...wynik,MedicationStatements:ms,Observations: obs}
+  return wynik
 }
 function lista(r,klasa) {
   const wynik = []
@@ -38,7 +40,7 @@ router.get('/Patient/:id', async function(req, res) {
   res.setHeader('Content-Type', 'application/json')
   console.log(url)
   const patientJSON  = JSON.parse(await rp(url))
-  const patient = patientFromRespone(patientJSON, 'Patient')
+
   try{
     const MSurl = `http://hapi.fhir.org/baseDstu3/MedicationStatement?patient=${id}&_pretty=true`
     listaStatementow = lista(JSON.parse(await rp(MSurl)),'MedicationStatement')
@@ -48,7 +50,8 @@ router.get('/Patient/:id', async function(req, res) {
     listaObservacji = lista(JSON.parse(await rp(Ourl)),'Observation')
   } catch (e) {}
   console.log(listaStatementow)
-  res.end(JSON.stringify(listaStatementow))
+  const patient = patientFromRespone(patientJSON,listaStatementow,listaObservacji)
+  res.end(JSON.stringify(patient))
 })
 router.post('/:klasa', function(req, res) {
   res.send('POST route on things.')
