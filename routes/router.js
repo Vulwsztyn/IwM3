@@ -18,22 +18,39 @@ const defVals = {
   MedicationStatement: '1952915',
 }
 const R = require('ramda')
-function patientFromRespone(r, klasa) {
-  return R.pick(Object.keys(new klasy[klasa]()), r)
+function patientFromRespone(r, ms,obs) {
+  let wynik = R.pick(Object.keys(new Patient()), r)
+  wynik= {...wynik,MedicationStatements:ms,Observations: obs}
+  return wynik
+}
+function lista(r,klasa) {
+  const wynik = []
+  const obj = new klasy[klasa]()
+  for (i of r.entry) {
+    wynik.push(R.pick(Object.keys(obj), i.resource))
+  }
+  return wynik
 }
 
-router.get('/:klasa', async function(req, res) {
-  const klasa = R.replace(
-    'st',
-    'St',
-    R.toUpper(req.params.klasa[0]) + R.toLower(req.params.klasa.substring(1, req.params.klasa.length)),
-  )
-  const id = req.body.id || defVals[klasa]
-  const url = `http://hapi.fhir.org/baseDstu3/${klasa}/`
-  const ending = '?_format=json'
+router.get('/Patient/:id', async function(req, res) {
+  let listaStatementow = []
+  let listaObservacji = []
+  const id = req.params.id || 1716558
+  const url = `http://hapi.fhir.org/baseDstu3/Patient/${id}?_format=json`
   res.setHeader('Content-Type', 'application/json')
-  const response = JSON.parse(await rp(url + id + ending))
-  const patient = patientFromRespone(response, klasa)
+  console.log(url)
+  const patientJSON  = JSON.parse(await rp(url))
+
+  try{
+    const MSurl = `http://hapi.fhir.org/baseDstu3/MedicationStatement?patient=${id}&_pretty=true`
+    listaStatementow = lista(JSON.parse(await rp(MSurl)),'MedicationStatement')
+  } catch (e) {}
+  try {
+    const Ourl = `http://hapi.fhir.org/baseDstu3/Observation?subject=${id}&_pretty=true`
+    listaObservacji = lista(JSON.parse(await rp(Ourl)),'Observation')
+  } catch (e) {}
+  console.log(listaStatementow)
+  const patient = patientFromRespone(patientJSON,listaStatementow,listaObservacji)
   res.end(JSON.stringify(patient))
 })
 router.post('/:klasa', function(req, res) {
