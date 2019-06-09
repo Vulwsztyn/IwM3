@@ -33,6 +33,7 @@ function lista(r,klasa) {
 }
 
 router.get('/Patient/:id', async function(req, res, next) {
+  const idObs = req.query.idObs;
   let listaStatementow = [];
   let listaObservacji = [];
   const id = req.params.id || 1716558;
@@ -48,11 +49,28 @@ router.get('/Patient/:id', async function(req, res, next) {
     const Ourl = `http://hapi.fhir.org/baseDstu3/Observation?subject=${id}&_pretty=true`;
     listaObservacji = lista(JSON.parse(await rp(Ourl)),'Observation')
   } catch (e) {}
-  console.log(listaStatementow);
+  console.log(listaObservacji);
   const patient = patientFromRespone(patientJSON,listaStatementow,listaObservacji);
   res.setHeader('Content-type','text/html');
-  res.render('patient', {data: patient });
+  if(!idObs)res.render('patient', {data: patient });
+  else{
+      let daneDoWykresu=[];
+      for(let i=0;i<listaObservacji.length;i++){
+        if (listaObservacji[i].code.text === listaObservacji[idObs].code.text){
+            let obj={
+              date:listaObservacji[i].effectiveDateTime,
+              value:listaObservacji[i].valueQuantity.value
+            };
+            daneDoWykresu.push(obj);
+        }
+      }
+      console.log(daneDoWykresu);
+      res.render('observation', {data: patient,observationIndex: idObs,graphData: daneDoWykresu });
+  }
 });
+
+
+
 router.post('/:klasa', function(req, res) {
   res.send('POST route on things.')
 });

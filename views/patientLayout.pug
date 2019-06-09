@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    div.grid-container#header
+        div
+            button &#8592; Back To Patient List
+        div
+            p #{data.id}
+        div
+            p #{data.name[0].text} #{data.name[0].family}
+        div
+            p #{data.birthDate}
+        div
+            p #{data.gender}
+
+    block main

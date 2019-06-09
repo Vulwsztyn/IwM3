@@ -1,0 +1,40 @@
+extends patientLayout
+
+block main
+    div.body
+        div.grid-container#buttons
+            form(method="get" action="./"+data.id.toString() )
+                button &#8592; Back
+
+        div.grid-container.observations
+            div
+                p= data.Observations[observationIndex].code.text
+            div
+                p= data.Observations[observationIndex].effectiveDateTime
+            div
+                p= data.Observations[observationIndex].valueQuantity.value+data.Observations[observationIndex].valueQuantity.unit
+
+        div.graph
+            canvas( id="myChart" width="400" height="400")
+            script.
+                var x = []
+                var y = []
+            each data in graphData
+                script.
+                    x.push("#{data.date}")
+                    y.push(parseFloat("#{data.value}"))
+
+            script.
+                console.log(y)
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myLineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels:x,
+                        datasets: [{
+                            label:"#{data.Observations[observationIndex].code.text}",
+                            borderColor: "#3e95cd",
+                            data: y
+                        }]
+                    }
+                });

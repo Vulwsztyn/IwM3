@@ -1,18 +1,6 @@
-extends layout
+extends patientLayout
 
-block content
-  div.grid-container#header
-      div
-        button &#8592; Go Back
-      div
-        p #{data.id}
-      div
-        p #{data.name[0].text} #{data.name[0].family}
-      div
-        p #{data.birthDate}
-      div
-        p #{data.gender}
-
+block main
   div.body
 
     div.grid-container#buttons
@@ -23,11 +11,13 @@ block content
 
 
     div.grid-container.observations
-      each observation in data.Observations
+      each observation, index in data.Observations
         div
           p= observation.effectiveDateTime
         div
-          p= observation.code.text
+          a(href="./"+data.id.toString()+"?idObs="+index.toString())=observation.code.text
+        div
+            p= observation.valueQuantity.value+" "+observation.valueQuantity.unit
 
     //div.grid-container.observations
     //  each medication in data.MedicationStatements.medicationCodeableConcept.coding[0].display
