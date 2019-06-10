@@ -1,5 +1,5 @@
 class Patient {
-  constructor(id, versionId, lastUpdated, gender, birthDate, active, name, surname, address, city) {
+  constructor(id, versionId, lastUpdated, gender, birthDate, active, name, surname, address, city, extension) {
     this.id = id
     this.versionId = versionId
     this.lastUpdated = lastUpdated
@@ -10,6 +10,7 @@ class Patient {
     this.surname = surname
     this.address = address
     this.city = city
+    this.extension = extension
   }
 }
 module.exports = Patient

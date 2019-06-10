@@ -1,5 +1,21 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  form(method='GET' action='/')
+    div
+      label Filter by name:
+      input(type='text' name='name')
+    button(type='submit') Filter
+
+  table
+    tbody
+      tr
+        td ID
+        td Name
+      each patient,index in patientList
+        tr
+          td 
+            a(href="./Patient/"+patient.resource.id)=patient.resource.id
+          td=patient.resource.name[0].text
+            
+

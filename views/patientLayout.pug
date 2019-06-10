@@ -3,13 +3,24 @@ extends layout
 block content
     div.grid-container#header
         div
-            button &#8592; Back To Patient List
+            form(action='/' method='GET')
+                button(type=submit) &#8592; Back To Patient List
+            form(action='/Patient/'+data.id, method='GET')
+                input(type='text' name='edit', value=1 hidden)
+                button(type=submit) Edit
         div
             p #{data.id}
         div
-            p #{data.name[0].text} #{data.name[0].family}
+            p #{data.name[0].given[0]} #{data.name[0].family}
+        if edit
+            form(action='/Patient/'+data.id, method='POST')
+                label Name:
+                input(type='text' name='nameEdit', value=data.name[0].given[0])
+                label Surname:
+                input(type='text' name='surnameEdit', value=data.name[0].family)
+                button(type=submit) Edit
         div
-            p #{data.birthDate}
+            p #{data.extension.birthDate}
         div
             p #{data.gender}
 

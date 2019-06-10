@@ -4,11 +4,14 @@ block main
   div.body
 
     div.grid-container#buttons
-      div
+      form(action='/Patient/'+data.id, method='GET')
+        label From:
         input(type='date' name='dateFrom').date
-      div
+        br
+        label To:
         input(type='date' name='dateTo').date
-
+        br
+        button(type='submit') Filter
 
     div.grid-container.observations
       each observation, index in data.Observations
@@ -17,9 +20,10 @@ block main
         div
           a(href="./"+data.id.toString()+"?idObs="+index.toString())=observation.code.text
         div
-            p= observation.valueQuantity.value+" "+observation.valueQuantity.unit
+            if observation.valueQuantity
+              p= observation.valueQuantity.value+" "+observation.valueQuantity.unit
 
-    //div.grid-container.observations
-    //  each medication in data.MedicationStatements.medicationCodeableConcept.coding[0].display
-    //    div
-    //      p= medication.medicationCodeableConcept.coding
+    div.grid-container.observations
+      each medication in data.MedicationStatements
+        div
+          p= medication.medicationCodeableConcept.text
