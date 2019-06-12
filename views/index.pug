@@ -12,10 +12,12 @@ block content
       tr
         td ID
         td Name
-      each patient,index in patientList
-        tr
-          td 
-            a(href="./Patient/"+patient.resource.id)=patient.resource.id
-          td=patient.resource.name[0].text
+      if patientList
+        each patient,index in patientList
+          tr
+            td 
+              a(href="./Patient/"+patient.resource.id)=patient.resource.id
+            if patient.resource.name
+              td=patient.resource.name[0].text
             
 

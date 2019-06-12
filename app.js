@@ -5,9 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const bodyParser = require('body-parser')
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-const router = require('./routes/router')
+
+const router = require('./routes/index');
 
 var app = express();
 
@@ -48,9 +47,7 @@ const medicationStatementIDs = [
 
 const medicationIDs = [1946955]
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/data', router);
+app.use('/', router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

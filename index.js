@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-
+const cors = require('cors')
 const app = express()
 app.use(bodyParser.json())
 const patientIDs = [
@@ -30,8 +30,8 @@ const medicationStatementIDs = [
 
 const medicationIDs = [1946955]
 
-const router = require('./routes/router')
-
+const router = require('./routes')
+app.use(cors())
 app.use('/', router)
 
 app.listen(3000)
