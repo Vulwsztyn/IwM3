@@ -13,17 +13,32 @@ block main
                 p= data.Observations[observationIndex].effectiveDateTime
             div
                 p= data.Observations[observationIndex].valueQuantity.value+data.Observations[observationIndex].valueQuantity.unit
-
+        div.grid-container#buttons
+            form(action='/Patient/'+data.id+'?idObs='+idObs, method='GET')
+                input(type='text' name='idObs' value=observationIndex hidden)
+                label From:
+                input(type='date' name='dateFrom').date
+                br
+                label To:
+                input(type='date' name='dateTo').date
+                br
+                button(type='submit') Filter
         div.graph
             canvas( id="myChart" width="400" height="400")
             script.
                 var x = []
                 var y = []
+                var data3 =[]
             each data in graphData
                 script.
-                    x.push("#{data.date}")
+                    q="#{data.date}"
+                    x.push(q)
                     y.push(parseFloat("#{data.value}"))
-
+                    //- data3.push({
+                    //-     x:
+                    //-     y:parseFloat("#{data.value}")
+                    //- })
+            
             script.
                 console.log(y)
                 var ctx = document.getElementById('myChart').getContext('2d');

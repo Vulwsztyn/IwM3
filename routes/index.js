@@ -1,8 +1,4 @@
 const axios = require('axios')
-
-const { Curl } = require('node-libcurl')
-var unirest = require('unirest')
-// const curl = new (require('curl-request'))()
 const express = require('express')
 const router = express.Router()
 const rp = require('request-promise')
@@ -11,9 +7,6 @@ const Observation = require('../classes/Observation')
 const Medication = require('../classes/Medication')
 const MedicationStatement = require('../classes/MedicationStatement')
 const pug = require('pug')
-const https = require('https')
-const request = require('request')
-const http = require('http')
 const klasy = {
   Patient: Patient,
   Observation: Observation,
@@ -66,7 +59,11 @@ router.get('/Patient/:id', async function(req, res, next) {
   } catch (e) {}
   try {
     const Ourl = `http://hapi.fhir.org/baseDstu3/Observation?subject=${id}&_pretty=true`
-    listaObservacji = lista(JSON.parse(await rp(Ourl)), 'Observation', req.query.dateFrom, req.query.dateTo)
+    if (!idObs) {
+      listaObservacji = lista(JSON.parse(await rp(Ourl)), 'Observation', req.query.dateFrom, req.query.dateTo)
+    } else {
+      listaObservacji = lista(JSON.parse(await rp(Ourl)), 'Observation')
+    }
   } catch (e) {}
   // console.log(listaStatementow)
   const patient = patientFromRespone(patientJSON, listaStatementow, listaObservacji)
@@ -77,19 +74,36 @@ router.get('/Patient/:id', async function(req, res, next) {
   if (!idObs) {
     res.render('patient.pug', { data: patient, edit })
   } else {
-    let daneDoWykresu = []
+    const daneDoWykresu = []
+    const dateFrom = req.query.dateFrom
+    const dateTo = req.query.dateTo
+    console.log(dateFrom, dateTo)
     for (let i = 0; i < listaObservacji.length; i++) {
       if (listaObservacji[i].code.text === listaObservacji[idObs].code.text) {
         let obj = {
           date: listaObservacji[i].effectiveDateTime,
           value: listaObservacji[i].valueQuantity.value,
         }
-        daneDoWykresu.push(obj)
+        if (dateFrom && dateTo) {
+          const dF = new Date(dateFrom)
+          const dT = new Date(dateTo)
+          const d = new Date(obj.date)
+          if (d >= dF && d <= dT) {
+            daneDoWykresu.push(obj)
+          }
+        } else {
+          daneDoWykresu.push(obj)
+        }
       }
     }
     // console.log(daneDoWykresu)
 
-    res.render('observation.pug', { data: patient, observationIndex: idObs, graphData: daneDoWykresu, edit })
+    res.render('observation.pug', {
+      data: patient,
+      observationIndex: idObs,
+      graphData: R.sortBy(R.prop('date'), daneDoWykresu),
+      edit,
+    })
   }
 })
 
@@ -108,6 +122,7 @@ router.get('/', async function(req, res) {
 })
 
 router.post('/Patient/:id', async function(req, res) {
+  console.log(req.query)
   const id = req.params.id
   const url = `http://hapi.fhir.org/baseDstu3/Patient/${id}?_format=json`
   console.log(url)
@@ -141,6 +156,73 @@ router.post('/Patient/:id', async function(req, res) {
     .catch(e => console.log(e))
 
   res.redirect('/Patient/' + id)
+})
+
+router.post('/MedicationRequest/:id', async function(req, res) {
+  const id = req.params.id
+  const url = `http://hapi.fhir.org/baseDstu3/MedicationRequest/${id}?_format=json`
+  console.log(url)
+  const patient = JSON.parse(await rp(url))
+  if (req.body.text) {
+    patient.medicationCodeableConcept.text = req.body.text
+  }
+
+  const patientJSON = JSON.stringify(patient)
+
+  await axios
+    .put(`http://hapi.fhir.org/baseDstu3/MedicationRequest/${id}`, patientJSON, {
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'PostmanRuntime/7.13.0',
+        Accept: '*/*',
+        'Cache-Control': 'no-cache',
+        'Postman-Token': '844d9426-92f1-49a9-852b-048d2786e097,f7f4e6f9-c1d2-461f-a974-2252bec4b216',
+        Host: 'hapi.fhir.org',
+        'accept-encoding': 'gzip, deflate',
+        'content-length': patientJSON.length,
+        Connection: 'keep-alive',
+        'cache-control': 'no-cache',
+      },
+    })
+    .then(r => console.log(r.status))
+    .catch(e => console.log(e))
+
+  res.redirect('/Patient/' + req.body.id)
+})
+
+router.post('/Observation/:id', async function(req, res) {
+  const id = req.params.id
+  const url = `http://hapi.fhir.org/baseDstu3/Observation/${id}?_format=json`
+  console.log(url)
+  const patient = JSON.parse(await rp(url))
+  if (req.body.value) {
+    patient.valueQuantity.value = req.body.value
+  }
+  if (req.body.unit) {
+    patient.valueQuantity.unit = req.body.unit
+  }
+
+  const patientJSON = JSON.stringify(patient)
+
+  axios
+    .put(`http://hapi.fhir.org/baseDstu3/Observation/${id}`, patientJSON, {
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'PostmanRuntime/7.13.0',
+        Accept: '*/*',
+        'Cache-Control': 'no-cache',
+        'Postman-Token': '844d9426-92f1-49a9-852b-048d2786e097,f7f4e6f9-c1d2-461f-a974-2252bec4b216',
+        Host: 'hapi.fhir.org',
+        'accept-encoding': 'gzip, deflate',
+        'content-length': patientJSON.length,
+        Connection: 'keep-alive',
+        'cache-control': 'no-cache',
+      },
+    })
+    .then(r => console.log(r.status))
+    .catch(e => console.log(e))
+  console.log(req.body)
+  res.redirect('/Patient/' + req.body.id)
 })
 
 module.exports = router

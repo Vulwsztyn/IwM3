@@ -21,9 +21,25 @@ block main
           a(href="./"+data.id.toString()+"?idObs="+index.toString())=observation.code.text
         div
             if observation.valueQuantity
-              p= observation.valueQuantity.value+" "+observation.valueQuantity.unit
+              unless edit
+                  p= observation.valueQuantity.value+" "+observation.valueQuantity.unit
+              if edit
+                  form(action='/Observation/'+observation.id, method='POST')
+                      input(type='text' name='id', value=data.id hidden)
+                      input(type='text' name='value', value=observation.valueQuantity.value)
+                      input(type='text' name='unit', value=observation.valueQuantity.unit)
+                      button(type=submit) Edit
+              
 
     div.grid-container.observations
       each medication in data.MedicationStatements
         div
-          p= medication.medicationCodeableConcept.text
+        div
+        div
+          unless edit
+                p= medication.medicationCodeableConcept.text
+          if edit
+              form(action='/MedicationRequest/'+medication.id, method='POST')
+                  input(type='text' name='id', value=data.id hidden)
+                  input(type='text' name='text', value=medication.medicationCodeableConcept.text)
+                  button(type=submit) Edit
