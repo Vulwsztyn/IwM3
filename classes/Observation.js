@@ -1,12 +1,12 @@
 class Observation {
-
-  constructor(id, text, subjectID, issuedDate, value, unit) {
+  constructor(id, code, effectiveDateTime, category, status, interpretation, valueQuantity) {
     this.id = id
-    this.text = text
-    this.subjectID = subjectID
-    this.issuedDate = issuedDate
-    this.value = value
-    this.unit = unit
+    this.code = code
+    this.effectiveDateTime = effectiveDateTime
+    this.category = category
+    this.status = status
+    this.interpretation = interpretation
+    this.valueQuantity = valueQuantity
   }
 }
 module.exports = Observation

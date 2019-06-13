@@ -1,0 +1,23 @@
+extends layout
+
+block content
+  form(method='GET' action='/')
+    div
+      label Filter by name:
+      input(type='text' name='name')
+    button(type='submit') Filter
+
+  table
+    tbody
+      tr
+        td ID
+        td Name
+      if patientList
+        each patient,index in patientList
+          tr
+            td 
+              a(href="./Patient/"+patient.resource.id)=patient.resource.id
+            if patient.name
+              td=patient.name[0].text
+            
+
